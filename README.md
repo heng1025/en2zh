@@ -4,9 +4,9 @@
 ```sh
 cd api/api4deno
 # dev
-deno run -A --watch main.ts
+deno task dev
 # build
-deno compile -A -o endict main.ts
+deno task build
 ```
 
 ### Api(Go)
