@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
+	"github.com/joho/godotenv"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -30,49 +32,50 @@ type Dict struct {
 
 var stmt *sql.Stmt
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	q := r.URL.Query()
-	result := queryWord(q.Get("q"))
-	fmt.Fprint(w, result)
+func initDB(dbPath string) {
+	db, err := sql.Open("sqlite3", dbPath)
+	if err != nil {
+		log.Fatal("unable to use data source name", err)
+	}
+	stmt, err = db.Prepare("SELECT * FROM stardict WHERE word = ?")
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
-func queryWord(q string) string {
-	var dict Dict
+func dictHandler(w http.ResponseWriter, r *http.Request) {
+	q := r.URL.Query()
+	result := queryWord(q.Get("q"))
+	json.NewEncoder(w).Encode(result)
+}
+
+func queryWord(q string) (dict Dict) {
 	row := stmt.QueryRow(q)
 	row.Scan(&dict.Id, &dict.Word, &dict.Sw, &dict.Phonetic, &dict.Definition,
 		&dict.Translation, &dict.Pos, &dict.Collins, &dict.Oxford, &dict.Tag,
 		&dict.Bnc, &dict.Frq, &dict.Exchange, &dict.Detail, &dict.Audio,
 	)
-
-	result, err := json.Marshal(&dict)
-
-	if err != nil {
-		log.Fatal("query fail", err)
-	}
-	return string(result)
+	return
 }
+
 func main() {
-	// var err error
-	db, err := sql.Open("sqlite3", "./ecdict.db")
-
+	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("unable to use data source name", err)
+		log.Fatal("Error loading .env file", err)
 	}
 
-	stmt, err = db.Prepare("SELECT * FROM stardict WHERE word = ?")
+	port := os.Getenv("PORT")
+	dbPath := os.Getenv("DB_URL")
 
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	initDB(dbPath)
 	defer stmt.Close()
 
-	http.HandleFunc("/dict", handler)
-	log.Println("Start listening on port 8080 of localhost")
+	http.HandleFunc("/dict", dictHandler)
+	fmt.Println("Listening on http://localhost:" + port)
+	err = http.ListenAndServe(":"+port, nil)
 
-	err = http.ListenAndServe(":8080", nil)
 	if err != nil {
-		log.Fatal("run fail")
+		log.Fatal("run fail", err)
 	}
 
 }

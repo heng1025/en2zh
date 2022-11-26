@@ -1,9 +1,19 @@
 ## Offline dictionary Api
 
-### Deno
+### Api(Deno)
+```sh
+cd api/api4deno
+# dev
+deno run -A --watch main.ts
+# build
+deno compile -A -o endict main.ts
+```
 
-- `deno run -A main.ts`
-
-### Go
-
-- `go run main.go`
+### Api(Go)
+```sh
+cd api/api4go
+# dev
+go run main.go
+# build
+go build -o endict main.go
+```
