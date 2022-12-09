@@ -1,11 +1,10 @@
 name: Deploy To GH-PAGES
 
 on:
-  - push
-  - pull_request
+  workflow_dispatch:
 
 jobs:
-  cache-and-install:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:

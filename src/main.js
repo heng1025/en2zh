@@ -14,7 +14,7 @@ async function search(text) {
         from: "inline",
         config: {
           serverMode: "full",
-          url: "/ecdict.db",
+          url: "/webdict.db",
           requestChunkSize: 1024 * 32,
         },
       },
