@@ -18,6 +18,6 @@
     "sql.js-httpvfs": "^0.8.12"
   },
   "devDependencies": {
-    "vite": "^3.2.5"
+    "vite": "^4.0.0"
   }
 }
