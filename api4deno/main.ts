@@ -1,81 +1,42 @@
-import { serve } from "https://deno.land/std@0.165.0/http/mod.ts";
-import { DB } from "https://deno.land/x/sqlite@v3.7.0/mod.ts";
-import { config } from "https://deno.land/std@0.166.0/dotenv/mod.ts";
+import "https://deno.land/std@0.188.0/dotenv/load.ts";
 
-const configData = await config();
-const port = parseInt(configData["PORT"]);
-const dbURL = configData["DB_URL"];
+import { serve, Client } from "./deps.ts";
+import { ApiCode, apiMessageMap, type ApiRes } from "./util.ts";
 
-const dbPath = `${Deno.cwd()}/${dbURL}`;
+const port = Deno.env.get("SERVER_PORT") || "8000";
 
-// read db
-const db = new DB(dbPath, { mode: "read" });
-const query = db.prepareQuery("SELECT * FROM stardict WHERE word = ?");
+const dbHost = Deno.env.get("DB_HOST");
+const dbPort = Deno.env.get("DB_PORT") || "3306";
+const dbName = Deno.env.get("DB_NAME") || "8000";
+const dbUsername = Deno.env.get("DB_USERNAME") || "8000";
+const dbPassword = Deno.env.get("DB_PASSWORD") || "8000";
 
-const enum ApiCode {
-  SUCCESS = 0,
-  URL_INCORRECT = 3001,
-  NO_PARAM = 3002,
-  NO_QUERY_RESULT = 3003,
-  SERVICE_ERROR = 3004,
-}
+const client = await new Client().connect({
+  hostname: dbHost,
+  port: parseInt(dbPort),
+  username: dbUsername,
+  password: dbPassword,
+  db: dbName,
+});
 
-const apiMessageMap = new Map<ApiCode, string>([
-  [ApiCode.SUCCESS, "success"],
-  [ApiCode.URL_INCORRECT, "url is incorrect,try /dict path"],
-  [ApiCode.NO_PARAM, "no query params,try q=hello"],
-  [ApiCode.NO_QUERY_RESULT, "query fail"],
-  [ApiCode.SERVICE_ERROR, "service error"],
-]);
-
-type ApiRes = {
-  code: number;
-  msg: string;
-  data?: unknown;
-};
-
-const dictRoute = (map: Map<keyof ApiRes, any>, sp: URLSearchParams) => {
-  const q = sp.get("q");
-  if (q) {
-    const data = query.firstEntry([q]);
+const handler = async (req: Request) => {
+  const { searchParams, pathname } = new URL(req.url);
+  const q = searchParams.get("q");
+  const ret = {} as ApiRes;
+  if (pathname === "/dict" && q) {
+    const sql = "SELECT * FROM stardict WHERE word = ?";
+    const [data] = await client.query(sql, [q]);
     if (data) {
-      map.set("code", ApiCode.SUCCESS).set("data", data);
+      ret.code = ApiCode.SUCCESS;
+      ret.data = data;
     } else {
-      map.set("code", ApiCode.NO_QUERY_RESULT);
+      ret.code = ApiCode.NO_QUERY_RESULT;
     }
   } else {
-    map.set("code", ApiCode.NO_PARAM);
+    ret.code = ApiCode.URL_INCORRECT;
   }
+  ret.msg = apiMessageMap.get(ret.code) || "Oops,err!";
+  return Response.json(ret);
 };
 
-const handler = (req: Request) => {
-  const url = new URL(req.url);
-  const sp = url.searchParams;
-  const pathname = url.pathname;
-
-  let map = new Map<keyof ApiRes, any>();
-
-  if (pathname === "/dict") {
-    dictRoute(map, sp);
-  } else {
-    map.set("code", ApiCode.URL_INCORRECT);
-  }
-
-  const result = [...map].reduce((acc, [k, v]) => {
-    if (k === "code") {
-      acc[k] = v;
-      const msg = apiMessageMap.get(v);
-      if (typeof msg === "string") {
-        acc.msg = msg;
-      }
-    } else {
-      acc[k] = v;
-    }
-
-    return acc;
-  }, {} as ApiRes);
-
-  return Response.json(result);
-};
-
-await serve(handler, { port });
+await serve(handler, { port: parseInt(port) });

@@ -3,7 +3,9 @@
 ### Api(Deno)
 
 ```sh
-cd api/api4deno
+cd api4deno
+# rename
+mv .example.env .env
 # dev
 deno task dev
 # build
@@ -13,7 +15,7 @@ deno task build
 ### Api(Go)
 
 ```sh
-cd api/api4go
+cd api4go
 # dev
 go run main.go
 # build
