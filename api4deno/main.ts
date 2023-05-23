@@ -7,9 +7,9 @@ const port = Deno.env.get("SERVER_PORT") || "8000";
 
 const dbHost = Deno.env.get("DB_HOST");
 const dbPort = Deno.env.get("DB_PORT") || "3306";
-const dbName = Deno.env.get("DB_NAME") || "8000";
-const dbUsername = Deno.env.get("DB_USERNAME") || "8000";
-const dbPassword = Deno.env.get("DB_PASSWORD") || "8000";
+const dbName = Deno.env.get("DB_NAME") || "example";
+const dbUsername = Deno.env.get("DB_USERNAME") || "example";
+const dbPassword = Deno.env.get("DB_PASSWORD") || "example";
 
 const client = await new Client().connect({
   hostname: dbHost,
