@@ -31,17 +31,11 @@
     "https://deno.land/std@0.188.0/http/mod.ts": "ca1f014826ff666731325022859d21afece14d6b5be00cd098f30e555671bfae",
     "https://deno.land/std@0.188.0/http/negotiation.ts": "46e74a6bad4b857333a58dc5b50fe8e5a4d5267e97292293ea65f980bd918086",
     "https://deno.land/std@0.188.0/http/server.ts": "1b23463b5b36e4eebc495417f6af47a6f7d52e3294827a1226d2a1aab23d9d20",
-    "https://deno.land/std@0.188.0/http/server_sent_event.ts": "f752c9e4f0eba247a3fead8bfe0883f44e04d31c2dcc88776ba5230b7165a460"
-  },
-  "npm": {
-    "specifiers": {
-      "@planetscale/database@^1.7.0": "@planetscale/database@1.7.0"
-    },
-    "packages": {
-      "@planetscale/database@1.7.0": {
-        "integrity": "sha512-lWR6biXChUyQnxsT4RT1CIeR3ZJvwTQXiQ+158MnY3VjLwjHEGakDzdH9kwUGPk6CHvu6UeqRXp1DgUOVHJFTw==",
-        "dependencies": {}
-      }
-    }
+    "https://deno.land/std@0.188.0/http/server_sent_event.ts": "f752c9e4f0eba247a3fead8bfe0883f44e04d31c2dcc88776ba5230b7165a460",
+    "https://esm.sh/@planetscale/database@1.7.0": "aca43fca7a69de57ff9ada99637183f219fe2eabe57101f7798666c721975bdd",
+    "https://esm.sh/v124/@planetscale/database@1.7.0/deno/database.mjs": "1b1640fb5e9d3a794874048e3a2a7b706cb08558d2e66cd274d8853610640a17",
+    "https://esm.sh/v124/@planetscale/database@1.7.0/dist/index.d.ts": "c76e4cdb21b6b682da87ae9ba84973c19b3a50206302c33b7cf68035f4d5b12a",
+    "https://esm.sh/v124/@planetscale/database@1.7.0/dist/sanitization.d.ts": "c28d964a0a95ec510811386cd4e7faa417526432cad7dfa9d23bc3e0e12a11fc",
+    "https://esm.sh/v124/@planetscale/database@1.7.0/dist/text.d.ts": "ba2c767e86eca7698a3212f2ac3d628e75b57c409c1dd1134bb981d0a76e6234"
   }
 }
