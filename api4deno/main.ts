@@ -1,22 +1,18 @@
 import "https://deno.land/std@0.188.0/dotenv/load.ts";
 
-import { serve, Client } from "./deps.ts";
-import { ApiCode, apiMessageMap, type ApiRes } from "./util.ts";
+import { serve, connect } from "./deps.ts";
+import { ApiCode, apiMessageMap, Dict, type ApiRes } from "./util.ts";
 
 const port = Deno.env.get("SERVER_PORT") || "8000";
 
 const dbHost = Deno.env.get("DB_HOST");
-const dbPort = Deno.env.get("DB_PORT") || "3306";
-const dbName = Deno.env.get("DB_NAME") || "example";
 const dbUsername = Deno.env.get("DB_USERNAME") || "example";
 const dbPassword = Deno.env.get("DB_PASSWORD") || "example";
 
-const client = await new Client().connect({
-  hostname: dbHost,
-  port: parseInt(dbPort),
+const client = connect({
+  host: dbHost,
   username: dbUsername,
   password: dbPassword,
-  db: dbName,
 });
 
 const handler = async (req: Request) => {
@@ -24,8 +20,10 @@ const handler = async (req: Request) => {
   const q = searchParams.get("q");
   const ret = {} as ApiRes;
   if (pathname === "/dict" && q) {
-    const sql = "SELECT * FROM stardict WHERE word = ?";
-    const [data] = await client.query(sql, [q]);
+    const sql = `SELECT * FROM stardict WHERE word = ?`;
+    const { rows } = await client.execute(sql, [q]);
+    const [data] = <Dict[]>rows;
+
     if (data) {
       ret.code = ApiCode.SUCCESS;
       ret.data = data;
