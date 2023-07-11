@@ -1,0 +1,28 @@
+@baseUrl =  http://localhost:8081
+
+# @name login
+POST  {{baseUrl}}/login
+
+{
+  "username": "iron",
+  "password": "123456"
+}
+
+###
+GET {{baseUrl}}/dict?q=hello
+
+### 
+@authToken = {{login.response.body.$.data.token}}
+
+POST {{baseUrl}}/records
+x-token: {{authToken}}
+
+{
+  "recordType": "2",
+  "text": "job",
+  "title": "123456"
+}
+
+### 
+GET   {{baseUrl}}/records?type=2
+x-token: {{authToken}}

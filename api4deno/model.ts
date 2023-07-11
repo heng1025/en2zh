@@ -30,11 +30,33 @@ type Dict = {
   audio: string;
 };
 
-type ApiRes = {
+type ApiRes<T> = {
   code: number;
   msg: string;
-  data?: Dict;
+  data?: T;
+};
+
+type User = {
+  id?: number;
+  username: string;
+  password: string;
+  email: string;
+  profileImage: string;
+  token: string;
+};
+
+type RecordType = "1" | "2";
+type Record = {
+  id: string;
+  text: string;
+  url: string;
+  title: string;
+  favIconUrl: string;
+  translation: string;
+  recordType: RecordType;
+  created_at: string;
+  created_by: string;
 };
 
 export { apiMessageMap, ApiCode };
-export type { ApiRes, Dict };
+export type { ApiRes, Dict, User, Record };

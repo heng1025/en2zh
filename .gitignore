@@ -3,3 +3,5 @@ endict
 node_modules
 dist
 api4deno/.env
+
+.vscode
