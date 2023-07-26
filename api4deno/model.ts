@@ -46,7 +46,7 @@ type User = {
 };
 
 type RecordType = "1" | "2";
-type Record = {
+type WordRecord = {
   id: string;
   text: string;
   url: string;
@@ -55,8 +55,8 @@ type Record = {
   translation: string;
   recordType: RecordType;
   created_at: string;
-  created_by: string;
+  created_by: User["id"];
 };
 
 export { apiMessageMap, ApiCode };
-export type { ApiRes, Dict, User, Record };
+export type { ApiRes, Dict, User, WordRecord, RecordType };
