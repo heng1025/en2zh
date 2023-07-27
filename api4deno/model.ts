@@ -53,7 +53,7 @@ type WordRecord = {
   title: string;
   favIconUrl: string;
   translation: string;
-  recordType: RecordType;
+  record_type: RecordType;
   created_at: string;
   created_by: User["id"];
 };

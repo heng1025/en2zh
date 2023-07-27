@@ -1,5 +1,5 @@
 export { serve } from "https://deno.land/std@0.194.0/http/mod.ts";
-export { format } from "https://deno.land/std@0.194.0/datetime/format.ts";
+export { format as dateFormat } from "https://deno.land/std@0.194.0/datetime/format.ts";
 export { generate } from "https://deno.land/std@0.194.0/uuid/v5.ts";
 export {
   crypto,

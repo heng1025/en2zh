@@ -3,7 +3,7 @@ import "https://deno.land/std@0.194.0/dotenv/load.ts";
 import {
   jose,
   serve,
-  format,
+  dateFormat,
   generate,
   crypto,
   toHashString,
@@ -62,7 +62,7 @@ const recordAdd = async (
   payload: WordRecord
 ) => {
   const { text, title, url, favIconUrl, translation } = payload;
-  const create_at = format(new Date(), "yyyy-MM-dd HH:mm:ss");
+  const create_at = dateFormat(new Date(), "yyyy-MM-dd HH:mm:ss");
   const uuid = await generate(
     NAMESPACE_URL,
     new TextEncoder().encode(recordType + create_at + userId)
@@ -123,9 +123,18 @@ const recordHandler = async (req: Request) => {
         return recordAdd(recordType, user.id, body);
       }
     } else if (method === "get") {
-      const recordSql = `SELECT * FROM records WHERE created_by = ? and record_type = ?`;
-      const rows = await excuteSql(recordSql, [String(user.id), recordType]);
-      return rows;
+      const recordSql = `SELECT url,favIconUrl,text,title,translation,created_at FROM records WHERE created_by = ? and record_type = ?`;
+      const rows: Array<WordRecord> = await excuteSql(recordSql, [
+        String(user.id),
+        recordType,
+      ]);
+      return rows.map(({ translation, created_at, ...rest }) => {
+        return {
+          ...rest,
+          translation: translation && JSON.parse(translation),
+          date: new Date(created_at).getTime(),
+        };
+      });
     } else if (method === "delete") {
       const body = await req.json();
       const { text } = body;
