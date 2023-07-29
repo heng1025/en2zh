@@ -6,5 +6,6 @@ export {
   toHashString,
 } from "https://deno.land/std@0.194.0/crypto/mod.ts";
 export { NAMESPACE_URL } from "https://deno.land/std@0.194.0/uuid/constants.ts";
+export * as log from "https://deno.land/std@0.194.0/log/mod.ts";
 export { connect } from "https://esm.sh/@planetscale/database@1.7.0";
 export * as jose from "https://deno.land/x/jose@v4.14.4/index.ts";

@@ -6,6 +6,7 @@ import {
   dateFormat,
   generate,
   crypto,
+  log,
   toHashString,
   NAMESPACE_URL,
 } from "./deps.ts";
@@ -21,7 +22,42 @@ import {
 } from "./model.ts";
 
 const port = Deno.env.get("SERVER_PORT") || "8000";
-const secret = new TextEncoder().encode("hEll0W_rld.");
+const secret = new TextEncoder().encode(Deno.env.get("SECRET"));
+
+await log.setup({
+  handlers: {
+    stringFmt: new log.handlers.ConsoleHandler("DEBUG", {
+      formatter: "[{levelName}]: {datetime} {msg}",
+    }),
+
+    functionFmt: new log.handlers.ConsoleHandler("DEBUG", {
+      formatter: (logRecord) => {
+        let msg = `${logRecord.level} ${logRecord.msg}`;
+
+        logRecord.args.forEach((arg, index) => {
+          msg += `, arg${index}: ${arg}`;
+        });
+
+        return msg;
+      },
+    }),
+
+    anotherFmt: new log.handlers.ConsoleHandler("DEBUG", {
+      formatter: "[{loggerName}] - {datetime} - {levelName} {msg}",
+    }),
+  },
+
+  loggers: {
+    default: {
+      level: "DEBUG",
+      handlers: ["stringFmt"],
+    },
+    dataLogger: {
+      level: "INFO",
+      handlers: ["anotherFmt"],
+    },
+  },
+});
 
 const dictHandler = async (req: Request) => {
   const { searchParams } = new URL(req.url);
@@ -146,6 +182,7 @@ const recordHandler = async (req: Request) => {
 };
 
 const handler = async (req: Request) => {
+  log.info(req.url);
   const ret = {} as ApiRes<Dict | User | WordRecord | string | unknown>;
   const { pathname } = new URL(req.url);
   try {
@@ -178,7 +215,7 @@ const handler = async (req: Request) => {
     }
   } catch (error) {
     ret.code = ApiCode.SERVICE_ERROR;
-    console.log("Err: ", error.message);
+    log.error(error.message);
   }
   ret.msg = ret.msg || apiMessageMap.get(ret.code) || "Oops,err!";
   return Response.json(ret);
