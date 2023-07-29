@@ -9,6 +9,21 @@ import {
 import { excuteSql } from "./dbHelper.ts";
 import { type User, type WordRecord, type RecordType } from "./model.ts";
 
+const getRecords = async (recordType: RecordType, userId: User["id"]) => {
+  const recordSql = `SELECT url,favIconUrl,text,title,translation,created_at FROM records WHERE created_by = ? and record_type = ?`;
+  const rows: Array<WordRecord> = await excuteSql(recordSql, [
+    String(userId),
+    recordType,
+  ]);
+  return rows.map(({ translation, created_at, ...rest }) => {
+    return {
+      ...rest,
+      translation: translation && JSON.parse(translation),
+      date: new Date(created_at).getTime(),
+    };
+  });
+};
+
 const addRecord = async (
   recordType: RecordType,
   userId: User["id"],
@@ -97,25 +112,11 @@ const deleteRecords = async (
   return "delete success";
 };
 
-const getRecords = async (recordType: RecordType, userId: User["id"]) => {
-  const recordSql = `SELECT url,favIconUrl,text,title,translation,created_at FROM records WHERE created_by = ? and record_type = ?`;
-  const rows: Array<WordRecord> = await excuteSql(recordSql, [
-    String(userId),
-    recordType,
-  ]);
-  return rows.map(({ translation, created_at, ...rest }) => {
-    return {
-      ...rest,
-      translation: translation && JSON.parse(translation),
-      date: new Date(created_at).getTime(),
-    };
-  });
-};
-
-const recordHandler = async (req: Request, secret: Uint8Array) => {
+const recordHandler = async (req: Request) => {
   const token = req.headers.get("x-token")!;
   const { searchParams } = new URL(req.url);
   const recordType = searchParams.get("type") as RecordType | null;
+  const secret = new TextEncoder().encode(Deno.env.get("SECRET"));
   const { payload } = await jose.jwtVerify(token, secret);
   const { username, password } = payload as User;
   const cryptoPs = await crypto.subtle.digest(
@@ -130,7 +131,9 @@ const recordHandler = async (req: Request, secret: Uint8Array) => {
   const method = req.method.toLocaleLowerCase();
 
   if (recordType && user?.id) {
-    if (method === "post") {
+    if (method === "get") {
+      return getRecords(recordType, user.id);
+    } else if (method === "post") {
       if (req.body) {
         const body = await req.json();
         if (body) {
@@ -140,8 +143,6 @@ const recordHandler = async (req: Request, secret: Uint8Array) => {
           return addRecord(recordType, user.id, body);
         }
       }
-    } else if (method === "get") {
-      return getRecords(recordType, user.id);
     } else if (method === "delete") {
       if (req.body) {
         const body = await req.json();
@@ -149,7 +150,7 @@ const recordHandler = async (req: Request, secret: Uint8Array) => {
         if (Array.isArray(text)) {
           return deleteRecords(recordType, text);
         }
-        return "text format invalid";
+        throw new Error("text format invalid");
       }
     }
   }

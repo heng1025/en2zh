@@ -18,17 +18,22 @@ GET {{baseUrl}}/dict?q=hello
 POST {{baseUrl}}/records?type=2
 x-token: {{authToken}}
 
+{
+  "text": "hello",
+  "title": "hello world"
+}
+
 ### add many
 POST {{baseUrl}}/records?type=2
 x-token: {{authToken}}
 
 [
   {
-    "text": "abb",
+    "text": "hello",
     "title": "hello world"
   },
   {
-    "text": "cc",
+    "text": "world",
     "title": "hello world"
   }
 ]
@@ -38,7 +43,7 @@ DELETE  {{baseUrl}}/records?type=2
 x-token: {{authToken}}
 
 {
-  "text": ["abb", "cc"]
+  "text": ["hello","world"]
 }
 
 ### 
