@@ -14,20 +14,31 @@ GET {{baseUrl}}/dict?q=hello
 ### 
 @authToken = {{login.response.body.$.data.token}}
 
+# add one
 POST {{baseUrl}}/records?type=2
 x-token: {{authToken}}
 
-{
-  "text": "good",
-  "title": "hello world"
-}
+### add many
+POST {{baseUrl}}/records?type=2
+x-token: {{authToken}}
+
+[
+  {
+    "text": "abb",
+    "title": "hello world"
+  },
+  {
+    "text": "cc",
+    "title": "hello world"
+  }
+]
 
 ### 
 DELETE  {{baseUrl}}/records?type=2
 x-token: {{authToken}}
 
 {
-  "text": "good"
+  "text": ["abb", "cc"]
 }
 
 ### 
