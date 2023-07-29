@@ -51,6 +51,7 @@ type WordRecord = {
   text: string;
   url: string;
   title: string;
+  date: Date;
   favIconUrl: string;
   translation: string;
   record_type: RecordType;
