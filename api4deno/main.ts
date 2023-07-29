@@ -152,31 +152,35 @@ const handler = async (req: Request) => {
     if (pathname === "/dict") {
       const data = await dictHandler(req);
       if (data) {
+        ret.code = ApiCode.SUCCESS;
         ret.data = data;
+      } else {
+        ret.code = ApiCode.NO_QUERY_RESULT;
       }
     } else if (pathname === "/login") {
       const data = await loginHandler(req);
       if (data) {
+        ret.code = ApiCode.SUCCESS;
         ret.data = data;
+      } else {
+        ret.code = ApiCode.NO_QUERY_RESULT;
       }
     } else if (pathname === "/records") {
       const data = await recordHandler(req);
-      if (data) {
+      if (typeof data === "string") {
+        ret.code = ApiCode.SUCCESS;
+        ret.msg = data;
+      } else {
         ret.data = data;
       }
     } else {
       ret.code = ApiCode.URL_INCORRECT;
     }
-    if (ret.data) {
-      ret.code = ApiCode.SUCCESS;
-    } else {
-      ret.code = ApiCode.NO_QUERY_RESULT;
-    }
   } catch (error) {
     ret.code = ApiCode.SERVICE_ERROR;
     console.log("Err: ", error.message);
   }
-  ret.msg = apiMessageMap.get(ret.code) || "Oops,err!";
+  ret.msg = ret.msg || apiMessageMap.get(ret.code) || "Oops,err!";
   return Response.json(ret);
 };
 
