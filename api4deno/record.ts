@@ -29,8 +29,15 @@ const addRecord = async (
   userId: User["id"],
   payload: WordRecord
 ) => {
-  const { text, date, title, url, favIconUrl, translation } = payload;
-  const created_at = dateFormat(date, "yyyy-MM-dd HH:mm:ss");
+  const {
+    text,
+    date = Date.now(),
+    title,
+    url,
+    favIconUrl,
+    translation,
+  } = payload;
+  const created_at = dateFormat(new Date(date), "yyyy-MM-dd HH:mm:ss");
   const uuid = await generate(
     NAMESPACE_URL,
     new TextEncoder().encode(text + created_at + recordType + userId)
@@ -66,8 +73,8 @@ const addRecords = async (
   const params = [];
   const sqlPlaceholders: string[] = [];
   for await (const w of payloads) {
-    const { text, date, title, url, favIconUrl, translation } = w;
-    const created_at = dateFormat(date || new Date(), "yyyy-MM-dd HH:mm:ss");
+    const { text, date = Date.now(), title, url, favIconUrl, translation } = w;
+    const created_at = dateFormat(new Date(date), "yyyy-MM-dd HH:mm:ss");
     const uuid = await generate(
       NAMESPACE_URL,
       new TextEncoder().encode(text + created_at + recordType + userId)
