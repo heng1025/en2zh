@@ -11,6 +11,7 @@ import {
   type WordRecord,
 } from "./model.ts";
 import { route } from "./route.ts";
+import { EmptyError } from "./error.ts";
 
 const port = Deno.env.get("SERVER_PORT") || "8000";
 
@@ -26,7 +27,11 @@ const handler = async (req: Request) => {
       ret.code = ApiCode.SUCCESS;
       ret.data = await route.get(pathname)(req);
     } catch (error) {
-      ret.code = ApiCode.SERVICE_ERROR;
+      if (error instanceof EmptyError) {
+        ret.code = ApiCode.NO_QUERY_RESULT;
+      } else {
+        ret.code = ApiCode.SERVICE_ERROR;
+      }
       ret.msg = error.message;
       log.error(error.message);
     }
